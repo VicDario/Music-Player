@@ -1,0 +1,21 @@
+.item {
+    padding-left: 20px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    height: 50px;
+    text-align: start;
+    color: white;
+}
+.item:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+.item p {
+    display: inline;
+    padding-right: 50px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.active {
+    background-color: rgba(255, 255, 255, 0.6)
+}
