@@ -12,9 +12,11 @@ let songsList = [
 
 function App() {
 	let audioPlayer = createRef();
+	let progressBar = createRef();
 	let [song, setSong] = useState('');
 	let [isPlaying, setPlay] = useState(false);
 	let [currentSelect, setCurrent] = useState(false);
+	let [duration, setDuration] = useState(0);
 
 	function selectSong(e){
 		audioPlayer.current.pause();
@@ -59,6 +61,22 @@ function App() {
 		}
 	}
 
+	function setProgressBar () {
+		const seconds = Math.floor(audioPlayer.current.duration);
+		setDuration(seconds);
+		progressBar.current.max = seconds;
+	}
+
+	function changeRange () {
+		setProgressBar();
+		audioPlayer.current.currentTime = progressBar.current.value;
+	}
+
+	function updateProgressBar() {
+		audioPlayer.current.currentTime = progressBar.current.value;
+	}
+	//updateProgressBar();
+
 	return (
 		<div className="app">
 			<div className="row">
@@ -82,8 +100,9 @@ function App() {
                     	<FontAwesomeIcon icon={faPause} className="icon" />}
             		</button>
             		<button className="button" type="button" onClick={next}><FontAwesomeIcon icon={faStepForward} className="icon" /></button>
-            		<audio ref={audioPlayer} src={song} />
+            		<input type="range" ref={progressBar} onChange={changeRange} />
         		</div>
+				<audio ref={audioPlayer} src={song} />
 			</div>
 		</div>
 	);
