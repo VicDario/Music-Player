@@ -32,15 +32,16 @@ function App() {
     } 
 
 	function next() {
-		if (!currentSelect) return;
+		if (currentSelect === false) return;
 		audioPlayer.current.pause();
-		if (currentSelect + 2 >= songs.length){
+		setPlay(false);
+		if (currentSelect + 1 === songs.length){
 			setCurrent(0);
 			setSong(`https://assets.breatheco.de/apis/sound/${songs[0].url}`);
 		}
-		if (currentSelect + 1 <= songs.length){
+		if (currentSelect + 1 < songs.length){
 			setCurrent(currentSelect+1);
-			setSong(`https://assets.breatheco.de/apis/sound/${songs[currentSelect-1].url}`);
+			setSong(`https://assets.breatheco.de/apis/sound/${songs[currentSelect+1].url}`);
 		}
 		console.log(song);
 	}
