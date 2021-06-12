@@ -16,14 +16,16 @@ function App() {
 	let [song, setSong] = useState('');
 	let [isPlaying, setPlay] = useState(false);
 	let [currentSelect, setCurrent] = useState(false);
-	let [duration, setDuration] = useState(0);
 
 	function selectSong(e){
 		audioPlayer.current.pause();
 		let select = e.target;
-		if(isPlaying) setPlay(!isPlaying);
 		setSong(`https://assets.breatheco.de/apis/sound/${select.name}`);
 		setCurrent(parseInt(select.id) - 1);
+		audioPlayer.current.src = song;
+		audioPlayer.current.load();
+		audioPlayer.current.play();
+		setPlay(true);
 	}
  
 	function togglePlayPause() {
@@ -36,7 +38,7 @@ function App() {
 	function next() {
 		if (currentSelect === false) return;
 		audioPlayer.current.pause();
-		setPlay(false);
+		setPlay(true);
 		if (currentSelect + 1 === songsList.length){
 			setCurrent(0);
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[0].url}`);
@@ -45,12 +47,15 @@ function App() {
 			setCurrent(currentSelect+1);
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[currentSelect+1].url}`);
 		}
+		audioPlayer.current.src = song;
+		audioPlayer.current.load();
+		audioPlayer.current.play();
 	}
 
 	function previous() {
 		if (currentSelect === false) return;
 		audioPlayer.current.pause();
-		setPlay(false);
+		setPlay(true);
 		if (currentSelect - 1 === -1){
 			setCurrent(songsList.length-1);
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[songsList.length-1].url}`);
@@ -59,11 +64,13 @@ function App() {
 			setCurrent(currentSelect-1);
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[currentSelect-1].url}`);
 		}
+		audioPlayer.current.src = song;
+		audioPlayer.current.load();
+		audioPlayer.current.play();
 	}
 
 	function setProgressBar () {
 		const seconds = Math.floor(audioPlayer.current.duration);
-		setDuration(seconds);
 		progressBar.current.max = seconds;
 	}
 
@@ -72,10 +79,9 @@ function App() {
 		audioPlayer.current.currentTime = progressBar.current.value;
 	}
 
-	function updateProgressBar() {
-		audioPlayer.current.currentTime = progressBar.current.value;
+	function ended (){
+		setPlay(false);
 	}
-	//updateProgressBar();
 
 	return (
 		<div className="app">
@@ -102,7 +108,7 @@ function App() {
             		<button className="button" type="button" onClick={next}><FontAwesomeIcon icon={faStepForward} className="icon" /></button>
             		<input type="range" ref={progressBar} onChange={changeRange} />
         		</div>
-				<audio ref={audioPlayer} src={song} />
+				<audio ref={audioPlayer} onEnded={ended}/>
 			</div>
 		</div>
 	);
