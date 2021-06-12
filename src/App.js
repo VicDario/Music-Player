@@ -1,6 +1,6 @@
 import Song from './components/Song';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faStepForward, faStepBackward, faMusic} from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause, faStepForward, faStepBackward, faMusic, faPlusCircle, faMinusCircle} from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 import { createRef, useState} from 'react';
 
@@ -83,6 +83,14 @@ function App() {
 		setPlay(false);
 	}
 
+	function upVolume() {
+		if(audioPlayer.current.volume === 1)	return;
+		audioPlayer.current.volume += 0.1;
+	}
+	function downVolume() {
+		if(audioPlayer.current.volume < 0.01)	return;
+		audioPlayer.current.volume -= 0.1;
+	}
 	return (
 		<div className="app">
 			<div className="row">
@@ -99,6 +107,8 @@ function App() {
 			</div>
 			<div className="row">
 				<div className="col-md-12 d-flex justify-content-center player">
+					<button className="button" type="button" onClick={downVolume}><FontAwesomeIcon icon={faMinusCircle} className="icon" /></button>
+					<button className="button" type="button" onClick={upVolume}><FontAwesomeIcon icon={faPlusCircle} className="icon" /></button>
            			<button className="button" type="button" onClick={previous}><FontAwesomeIcon icon={faStepBackward} className="icon"/></button>
             		<button className="button" type="button" onClick={togglePlayPause}>
                 	{isPlaying === false ? 
