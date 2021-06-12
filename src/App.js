@@ -7,7 +7,7 @@ import { createRef, useState} from 'react';
 let songsList = [
 	{ "id":1, "category":"game", "name":"Mario Castle", "url":"files/mario/songs/castle.mp3" },
 	{ "id":2, "category":"game", "name":"Mario Star", "url":"files/mario/songs/hurry-starman.mp3"},
-	{ "id":3, "category":"game", "name":"Mario Overworld", "url":"files/mario/songs/overworld.mp3"}
+	{ "id":3, "category":"game", "name":"Mario Overworld", "url":"files/mario/songs/overworld.mp3"},
 ]
 
 function App() {
@@ -105,10 +105,12 @@ function App() {
 				})
 			}
 			</div>
-			<div className="row">
-				<div className="col-md-12 d-flex justify-content-center player">
-					<button className="button" type="button" onClick={downVolume}><FontAwesomeIcon icon={faMinusCircle} className="icon" /></button>
-					<button className="button" type="button" onClick={upVolume}><FontAwesomeIcon icon={faPlusCircle} className="icon" /></button>
+			<div className="player">
+				<div className="volume">
+				<button className="button" type="button" onClick={downVolume}><FontAwesomeIcon icon={faMinusCircle} className="icon icon-volume" /></button>
+				<button className="button" type="button" onClick={upVolume}><FontAwesomeIcon icon={faPlusCircle} className="icon icon-volume" /></button>
+				</div>
+				<div className="controls">
            			<button className="button" type="button" onClick={previous}><FontAwesomeIcon icon={faStepBackward} className="icon"/></button>
             		<button className="button" type="button" onClick={togglePlayPause}>
                 	{isPlaying === false ? 
@@ -116,8 +118,11 @@ function App() {
                     	<FontAwesomeIcon icon={faPause} className="icon" />}
             		</button>
             		<button className="button" type="button" onClick={next}><FontAwesomeIcon icon={faStepForward} className="icon" /></button>
-            		<input type="range" ref={progressBar} onChange={changeRange} />
+            		
         		</div>
+				<div className="range">
+					<input type="range" ref={progressBar} onChange={changeRange} />
+				</div>
 				<audio ref={audioPlayer} onEnded={ended}/>
 			</div>
 		</div>
