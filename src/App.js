@@ -2,37 +2,71 @@ import Song from './components/Song';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faStepForward, faStepBackward, faMusic, faPlusCircle, faMinusCircle} from '@fortawesome/free-solid-svg-icons';
 import './App.css';
-import { createRef, useState} from 'react';
-
-let songsList = [
-	{ "id":1, "category":"game", "name":"Mario Castle", "url":"files/mario/songs/castle.mp3" },
-	{ "id":2, "category":"game", "name":"Mario Star", "url":"files/mario/songs/hurry-starman.mp3"},
-	{ "id":3, "category":"game", "name":"Mario Overworld", "url":"files/mario/songs/overworld.mp3"},
-]
+import { useRef, useEffect, useState} from 'react';
 
 function App() {
-	let audioPlayer = createRef();
-	let progressBar = createRef();
+	//States
 	let [song, setSong] = useState('');
 	let [isPlaying, setPlay] = useState(false);
 	let [currentSelect, setCurrent] = useState(false);
+	let [songsList, setList] = useState([]);
+	let [currentTime, setCurrentTime] = useState(0);
+
+	//References
+	let audioPlayer = useRef();
+	let progressBar = useRef();
+	let animationRef = useRef();
+
+	async function getSongs() {
+        try {
+            const response = await fetch('https://assets.breatheco.de/apis/sound/songs', {
+                method: 'GET', // GET POST PUT DELETE
+                //body: data, // POST PUT
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.status === 404) throw new Error("Pagina No encontrada");
+            const data = await response.json();
+        	setList(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+	useEffect(() => {
+		getSongs();
+	}, []);
+
+	useEffect(() =>{
+		console.log(audioPlayer.current.currentTime)
+	}, [audioPlayer?.current?.currentTime])
+
+	useEffect (() =>{
+		const seconds = Math.floor(audioPlayer.current.duration);
+		progressBar.current.max = seconds;
+	}, [audioPlayer?.current?.loadedmetadata, audioPlayer?.current?.readyState])
 
 	function selectSong(e){
-		audioPlayer.current.pause();
 		let select = e.target;
 		setSong(`https://assets.breatheco.de/apis/sound/${select.name}`);
-		setCurrent(parseInt(select.id) - 1);
+		setCurrent(parseInt(select.id));
 		audioPlayer.current.src = song;
-		audioPlayer.current.load();
 		audioPlayer.current.play();
 		setPlay(true);
+		animationRef.current = requestAnimationFrame(whilePlaying);
 	}
  
 	function togglePlayPause() {
 		if(currentSelect === false)	return; 
         setPlay(!isPlaying);
-		if(isPlaying) audioPlayer.current.pause()
-		else audioPlayer.current.play();
+		if(isPlaying) {
+			audioPlayer.current.pause();
+			cancelAnimationFrame(animationRef.current);
+		}
+		else{
+			audioPlayer.current.play();
+			animationRef.current = requestAnimationFrame(whilePlaying);
+		} 
     } 
 
 	function next() {
@@ -48,7 +82,6 @@ function App() {
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[currentSelect+1].url}`);
 		}
 		audioPlayer.current.src = song;
-		audioPlayer.current.load();
 		audioPlayer.current.play();
 	}
 
@@ -65,18 +98,18 @@ function App() {
 			setSong(`https://assets.breatheco.de/apis/sound/${songsList[currentSelect-1].url}`);
 		}
 		audioPlayer.current.src = song;
-		audioPlayer.current.load();
 		audioPlayer.current.play();
 	}
 
-	function setProgressBar () {
-		const seconds = Math.floor(audioPlayer.current.duration);
-		progressBar.current.max = seconds;
+	function changeRange () {
+		audioPlayer.current.currentTime = progressBar.current.value;
+		setCurrentTime(progressBar.current.value);
 	}
 
-	function changeRange () {
-		setProgressBar();
-		audioPlayer.current.currentTime = progressBar.current.value;
+	function whilePlaying () {
+		progressBar.current.value = audioPlayer.current.currentTime;
+		setCurrentTime(progressBar.current.value);
+		animationRef.current = requestAnimationFrame(whilePlaying);
 	}
 
 	function ended (){
@@ -93,15 +126,17 @@ function App() {
 	}
 	return (
 		<div className="app">
-			<div className="row">
+			<div className="row songlist">
 			{
-				songsList.map((song, e) => {
-					let active = {active: '', sound: ''};
-					if(e === currentSelect){
-						active.active = 'active';
-						active.sound = <FontAwesomeIcon icon={faMusic} className="MusicIcon"/>
-					}
-					return <Song sources={song} key={e} selectSong={selectSong} active={active.active} sound={active.sound} />
+				songsList !== undefined && 
+				songsList.map((song, key) => {
+				let active = {active: '', sound: ''};
+				let itemNumber = key;
+				if(key === currentSelect){
+					active.active = 'active';
+					active.sound = <FontAwesomeIcon icon={faMusic} className="MusicIcon"/>
+				}
+				return <Song sources={song} key={key} selectSong={selectSong} active={active.active} sound={active.sound} itemNumber={itemNumber} />
 				})
 			}
 			</div>

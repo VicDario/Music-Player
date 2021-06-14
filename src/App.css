@@ -9,6 +9,10 @@ body {
   overflow-x: hidden;
 }
 
+.songlist {
+  margin-bottom: 70px;
+}
+
 .icon {
   color: white;
   margin: 15px;
@@ -64,6 +68,9 @@ body {
   .icon-volume{
     font-size: 20px;
     margin: 8px;
+  }
+  .songlist {
+    margin-bottom: 140px;
   }
 }
 
